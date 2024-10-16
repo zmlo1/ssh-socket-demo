@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SSH Shell</title>
+    <style>
+      #terminal {
+        width: 100%;
+        height: 100vh;
+        background: #000;
+        color: #fff;
+        font-family: monospace;
+        padding: 10px;
+        overflow-y: auto;
+        position: relative;
+      }
+      #input {
+        width: 100%;
+        background: #000;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        font-family: monospace;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="terminal"></div>
+    <input type="text" id="input" autocomplete="off" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io()
+      const terminal = document.getElementById('terminal')
+      const input = document.getElementById('input')
+
+      socket.on('data', (data) => {
+        terminal.innerHTML += data.replace(/\n/g, '<br>')
+        terminal.scrollTop = terminal.scrollHeight
+      })
+
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          const command = input.value + '\n'
+          socket.emit('input', command)
+          input.value = ''
+        }
+      })
+
+      // Focus the input when clicking on the terminal
+      // terminal.addEventListener('click', () => {
+      //   input.focus()
+      // })
+
+      // Focus the input on page load
+      window.onload = () => {
+        input.focus()
+      }
+    </script>
+  </body>
+</html>
